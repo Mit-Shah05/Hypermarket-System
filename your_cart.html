@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloverse</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .frame {
+            display: flex;
+            justify-content: space-between;
+            padding: 20rem;
+            border: 1px solid #ccc;
+            border-radius: 1rem;
+            background-color: white;
+            box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .left-side {
+            flex: 1;
+            display: block;
+            gap: 20px;
+        }
+
+        .left-side img {
+            width: 50%;
+            height: auto;
+        }
+
+        .right-side {
+            flex: 1;
+            margin-left: 2rem;
+            font-size: medium;
+        }
+
+        h2,
+        h3 {
+            margin-top: 0;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: none;
+            border-top: 1px solid #ccc;
+        }
+
+        .heading {
+            margin-top: 20rem;
+            padding: 2rem;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-right: 20px;
+            border-radius: 8px;
+        }
+
+        .cart-item-details h4 {
+            margin: 0 0 5px 0;
+        }
+
+        .cart-item-details p {
+            margin: 0;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div id="menu-btn" class="fas fa-bars"></div>
+        <div class="logo"><a href="index.html"><img src="logo.png" style="height:130px;width:150px"></a></div>
+        <nav class="navbar">
+            <a href="clothing.php">Clothes</a>
+            <a href="grocery.php">Groceries</a>
+            <a href="electronics.php">Electronics</a>
+            <a href="fooditem.php">Food Items</a>
+        </nav>
+        <a href="account.html" class="btn">My Account</a>
+        <a href="your_cart.html" class="btn">Go to Cart</a>
+    </header>
+
+    <h1 class="heading">My Cart <span>your details</span></h1>
+    <div class="frame">
+        <div class="left-side" id="cart-items">
+            <h2>Item Description</h2>
+        </div>
+        <div class="right-side">
+            <h2>Order Summary</h2>
+            <p id="total-items"></p>
+            <p id="total-price"></p>
+            <hr>
+            <h3>Payment Options</h3>
+            <select id="payment-options">
+                <option value="cash-on-delivery">Cash on Delivery</option>
+                <option value="credit-card">Credit Card/Debit Card</option>
+                <option value="upi">UPI</option>
+            </select>
+
+            <div id="credit-card-details" style="display: none; font-size: 15px;">
+                <table>
+                    <tr>
+                        <td><label for="card-number">Card Number:</label><input type="text" id="card-number" required>
+                        </td>
+                        <td><label for="card-holder-name">Cardholder's Name:</label><input type="text"
+                                id="card-holder-name" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="expiry-date">Expiry Date:</label><input type="date" id="expiry-date" required>
+                        </td>
+                        <td><label for="cvv">CVV:</label><input type="password" id="cvv" required></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="upi-details" style="display: none; font-size: 15px;">
+                <table>
+                    <tr>
+                        <td><label for="upi-id">UPI ID:</label></td>
+                        <td><input type="text" id="upi-id" required></td>
+                    </tr>
+                </table>
+            </div>
+            <hr>
+            <h3>Total Bill</h3>
+            <p id="total-bill"></p>
+            <div>
+                <a class="btn" onclick="clearCart()">Clear Cart</a>
+                <a class="btn" href="#" id="orderNow">Order Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cartItems = JSON.parse(localStorage.getItem("selectedItems")) || [];
+            const container = document.getElementById("cart-items");
+            const totalItemsP = document.getElementById("total-items");
+            const totalPriceP = document.getElementById("total-price");
+            const totalBillP = document.getElementById("total-bill");
+
+            let total = 0;
+
+            if (cartItems.length === 0) {
+                container.innerHTML += '<p>Your cart is empty.</p>';
+            } else {
+                cartItems.forEach(item => {
+                    const itemDiv = document.createElement("div");
+                    itemDiv.classList.add("cart-item");
+                    itemDiv.innerHTML = `
+            <img src="${item.image}" alt="${item.name}">
+            <div class="cart-item-details">
+              <h4>${item.name}</h4>
+              <p>₹${item.price}</p>
+            </div>`;
+                    container.appendChild(itemDiv);
+                    total += item.price;
+                });
+
+                totalItemsP.textContent = `Total Items: ${cartItems.length}`;
+                totalPriceP.textContent = `Total Price: ₹${total.toFixed(2)}`;
+                totalBillP.textContent = `Total Bill: ₹${total.toFixed(2)}`;
+            }
+
+            document.getElementById("payment-options").addEventListener("change", function () {
+                const creditCard = document.getElementById("credit-card-details");
+                const upi = document.getElementById("upi-details");
+                creditCard.style.display = "none";
+                upi.style.display = "none";
+                if (this.value === "credit-card") creditCard.style.display = "block";
+                if (this.value === "upi") upi.style.display = "block";
+            });
+
+            document.getElementById("orderNow").addEventListener("click", function (e) {
+                e.preventDefault();
+                if (cartItems.length === 0) {
+                    alert("Your cart is empty.");
+                    return;
+                }
+
+                const paymentMethod = document.getElementById("payment-options").value;
+
+                fetch("order_now.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `cartItems=${encodeURIComponent(JSON.stringify(cartItems))}&paymentMethod=${paymentMethod}`
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        alert("Order placed successfully!");
+                        clearCart();
+                        setTimeout(() => {
+                            window.location.href = "success.html";
+                        }, 200);
+                    })
+                    .catch(err => {
+                        console.error("Error:", err);
+                        alert("Failed to place order.");
+                    });
+            });
+        });
+
+        function clearCart() {
+            localStorage.removeItem("selectedItems");
+            location.reload();
+        }
+    </script>
+</body>
+
+</html>
