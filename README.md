@@ -57,17 +57,6 @@ Interactive Product Pages:
 - `place_order.php`: Handles order storage in the database.
 - `view_cart.php`: Displays session-based cart.
 
----
-
-## 🧪 How to Run
-
-1. Clone the repository.
-2. Import `hypermarketdb.sql` into your local MySQL server.
-3. Set up Apache and PHP (XAMPP or WAMP).
-4. Place files in the `htdocs` directory.
-5. Start Apache and MySQL via control panel.
-6. Access the app via `localhost/hypermarket`.
-
 Tech Stack
 - **Frontend**: HTML, CSS
 - **Backend**: PHP
